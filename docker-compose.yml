@@ -1,0 +1,48 @@
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx-proxy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - dvwa
+    networks:
+      - dvwa-network
+    restart: unless-stopped
+
+  dvwa:
+    image: ghcr.io/digininja/dvwa:latest
+    container_name: dvwa-app
+    environment:
+      - DB_SERVER=db
+      - DB_DATABASE=dvwa
+      - DB_USER=dvwa
+      - DB_PASSWORD=dvwa_password
+    depends_on:
+      - db
+    networks:
+      - dvwa-network
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.6
+    container_name: dvwa-db
+    environment:
+      - MARIADB_ROOT_PASSWORD=root_password
+      - MARIADB_DATABASE=dvwa
+      - MARIADB_USER=dvwa
+      - MARIADB_PASSWORD=dvwa_password
+    volumes:
+      - dvwa-db-data:/var/lib/mysql
+    networks:
+      - dvwa-network
+    restart: unless-stopped
+
+volumes:
+  dvwa-db-data:
+
+networks:
+  dvwa-network:
+    driver: bridge
