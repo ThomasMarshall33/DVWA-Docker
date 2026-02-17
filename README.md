@@ -190,6 +190,5 @@ docker-compose up -d
 
 ---
 
-## Demo Video
 
 
